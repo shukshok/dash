@@ -62,7 +62,7 @@ async function seedCustomers() {
     CREATE TABLE IF NOT EXISTS customers (
       id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) NOT NULL,s
+      email VARCHAR(255) NOT NULL,
       image_url VARCHAR(255) NOT NULL
     );
   `;
@@ -102,10 +102,6 @@ async function seedRevenue() {
 }
 
 export async function GET() {
-  return Response.json({
-    message:
-      'Uncomment this file and remove this line. You can delete this file when you are finished.',
-  });
   try {
     await client.sql`BEGIN`;
     await seedUsers();
@@ -114,9 +110,13 @@ export async function GET() {
     await seedRevenue();
     await client.sql`COMMIT`;
 
-    return Response.json({ message: 'Database seeded successfully' });
+    // Success response
+    return new Response(JSON.stringify({ message: 'Database seeded successfully' }), { status: 200 });
   } catch (error) {
     await client.sql`ROLLBACK`;
-    return Response.json({ error }, { status: 500 });
+
+    // Error response
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Error seeding database', details: error.message }), { status: 500 });
   }
 }
